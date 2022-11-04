@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "kube-usage-metrics"
+version = "0.1.0"
+description = ""
+authors = ["Remi Rampin <remi@rampin.org>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+prometheus-client = "*"
+kubernetes = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
