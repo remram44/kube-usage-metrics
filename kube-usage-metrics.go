@@ -7,7 +7,7 @@ import (
     clientcmdapi "k8s.io/client-go/tools/clientcmd/api"
     metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
     metricsv "k8s.io/metrics/pkg/client/clientset/versioned"
-    rest "k8s.io/client-go/rest"
+    "k8s.io/client-go/rest"
     "k8s.io/apimachinery/pkg/api/resource"
 
     "log"
@@ -24,17 +24,22 @@ type Metrics struct {
 }
 
 func GetNamespaceMetrics(ctx context.Context, clientset *metricsv.Clientset) (map[string]Metrics, error) {
+    namespaces := make(map[string]Metrics)
+
     podMetricsList, err := clientset.MetricsV1beta1().PodMetricses("").List(ctx, metav1.ListOptions{})
     if err != nil {
         return nil, err
     }
-    namespaces := make(map[string]Metrics)
+
+    // Iterate on pods
     for _, pod := range podMetricsList.Items {
         ns, ok := namespaces[pod.Namespace]
         if !ok {
             ns = Metrics{Cpu: resource.NewQuantity(0, resource.DecimalSI), Memory: resource.NewQuantity(0, resource.DecimalSI)}
             namespaces[pod.Namespace] = ns
         }
+
+        // Iterate on containers
         for _, container := range pod.Containers {
             ns.Cpu.Add(container.Usage["cpu"])
             ns.Memory.Add(container.Usage["memory"])
